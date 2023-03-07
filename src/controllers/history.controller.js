@@ -73,7 +73,7 @@ const updateHistory = (req, res) => {
       return;
     }
     res.status(200).json({
-      message: "Product updated successfully",
+      message: "History updated successfully",
     });
   });
 };
@@ -82,9 +82,9 @@ const deleteHistory = (req, res) => {
   const { id } = req.params;
   historyModel.deleteHistory(id, (err, result) => {
     if (err) {
-      if (err.status === 300) {
-        res.status(300).json({
-          error: "Custom error message for status code 300",
+      if (err.status === 400) {
+        res.status(400).json({
+          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
         });
         return;
       } else {

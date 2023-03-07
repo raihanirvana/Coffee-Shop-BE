@@ -55,45 +55,25 @@ const insertPromo = (req, res) => {
 };
 
 const updatePromo = (req, res) => {
-  const promoId = req.params.id;
-  const { promo_name, coupon_code, expired } = req.body;
-
-  promoModel.Promo.findById(promoId, (err, promo) => {
+  const { id } = req.params;
+  const { body } = req;
+  promoModel.updatePromo(id, body, (err, result) => {
     if (err) {
+      console.error(err);
       res.status(500).json({
-        msg: "internal server error",
+        message: "Internal server error",
       });
-    } else {
-      if (promo === null) {
-        res.status(404).json({
-          msg: "Users not found",
-        });
-      } else {
-        promo.promo_name = promo_name;
-        promo.coupon_code = coupon_code;
-        promo.expired = expired;
-        promo.save((err, updatedPromo) => {
-          if (err) {
-            if (err.status === 300) {
-              res.status(300).json({
-                msg: "Custom error message for status code 300",
-              });
-              return;
-            } else {
-              res.status(500).json({
-                msg: "Internal server error",
-              });
-              return;
-            }
-          } else {
-            res.status(200).json({
-              msg: "Promo updated successfully",
-              data: updatedPromo,
-            });
-          }
-        });
-      }
+      return;
     }
+    if (result.rowCount === 0) {
+      res.status(404).json({
+        message: `Product with id ${id} not found`,
+      });
+      return;
+    }
+    res.status(200).json({
+      message: "promo updated successfully",
+    });
   });
 };
 
@@ -101,9 +81,9 @@ const deletePromo = (req, res) => {
   const { id } = req.params;
   promoModel.deletePromo(id, (err, result) => {
     if (err) {
-      if (err.status === 300) {
-        res.status(300).json({
-          error: "Custom error message for status code 300",
+      if (err.status === 400) {
+        res.status(400).json({
+          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
         });
         return;
       } else {

@@ -3,14 +3,9 @@ const userModel = require("../models/users.model");
 const getUsers = (req, res) => {
   userModel.getUsers((err, result) => {
     if (err) {
-      if (err.status === 300) {
-        res.status(300).json({
-          msg: "Custom error message for status code 300",
-        });
-        return;
-      } else if (err.status === 400) {
+      if (err.status === 400) {
         res.status(400).json({
-          msg: "Custom error message for status code 400",
+          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
         });
         return;
       } else {
@@ -30,14 +25,9 @@ const insertUsers = (req, res) => {
   const { body } = req;
   userModel.insertUsers(body, (err, result) => {
     if (err) {
-      if (err.status === 300) {
-        res.status(300).json({
-          msg: "Custom error message for status code 300",
-        });
-        return;
-      } else if (err.status === 400) {
+      if (err.status === 400) {
         res.status(400).json({
-          msg: "Custom error message for status code 400",
+          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
         });
         return;
       } else {
@@ -55,45 +45,25 @@ const insertUsers = (req, res) => {
 };
 
 const updateUsers = (req, res) => {
-  const usersId = req.params.id;
-  const { email, password, phone_number } = req.body;
-
-  userModel.Users.findById(usersId, (err, users) => {
+  const { id } = req.params;
+  const { body } = req;
+  userModel.updateUsers(id, body, (err, result) => {
     if (err) {
+      console.error(err);
       res.status(500).json({
-        msg: "internal server error",
+        message: "Internal server error",
       });
-    } else {
-      if (users === null) {
-        res.status(404).json({
-          msg: "Users not found",
-        });
-      } else {
-        users.email = email;
-        users.password = password;
-        users.phone_number = phone_number;
-        users.save((err, updatedUsers) => {
-          if (err) {
-            if (err.status === 300) {
-              res.status(300).json({
-                msg: "Custom error message for status code 300",
-              });
-              return;
-            } else {
-              res.status(500).json({
-                msg: "Internal server error",
-              });
-              return;
-            }
-          } else {
-            res.status(200).json({
-              msg: "Users updated successfully",
-              data: updatedUsers,
-            });
-          }
-        });
-      }
+      return;
     }
+    if (result.rowCount === 0) {
+      res.status(404).json({
+        message: `Product with id ${id} not found`,
+      });
+      return;
+    }
+    res.status(200).json({
+      message: "User updated successfully",
+    });
   });
 };
 
@@ -101,14 +71,9 @@ const deleteUsers = (req, res) => {
   const { id } = req.params;
   userModel.deleteUsers(id, (err, result) => {
     if (err) {
-      if (err.status === 300) {
-        res.status(300).json({
-          error: "Custom error message for status code 300",
-        });
-        return;
-      } else {
-        res.status(500).json({
-          error: "Internal server error",
+      if (err.status === 400) {
+        res.status(400).json({
+          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
         });
         return;
       }

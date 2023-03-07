@@ -20,49 +20,14 @@ const insertUsers = (body, callback) => {
   );
 };
 
-function Users(id, email, password, phone_number) {
-  this.id = id;
-  this.email = email;
-  this.password = password;
-  this.phone_number = phone_number;
-}
-
-Users.findById = function (id, callback) {
-  db.query("SELECT * FROM users WHERE id = $1", [id], function (err, result) {
-    if (err) {
-      callback(err, null);
-    } else {
-      if (result.rowCount === 0) {
-        callback(null, null);
-      } else {
-        const row = result.rows[0];
-        const users = new Users(
-          row.id,
-          row.email,
-          row.password,
-          row.phone_number
-        );
-        callback(null, users);
-      }
-    }
-  });
-};
-
-Users.prototype.save = function (callback) {
+const updateUsers = (id, body, callback) => {
   db.query(
-    "UPDATE users SET email = $1, password = $2, phone_number = $3 WHERE id = $4 RETURNING *",
-    [this.email, this.password, this.phone_number, this.id],
-    function (err, result) {
+    `UPDATE users SET email = '${body.email}', password = '${body.password}', phone_number = '${body.phone_number}' WHERE id = ${id}`,
+    (err, result) => {
       if (err) {
         callback(err, null);
       } else {
-        const updatedUsers = new Users(
-          result.rows[0].id,
-          result.rows[0].email,
-          result.rows[0].password,
-          result.rows[0].phone_number
-        );
-        callback(null, updatedUsers);
+        callback(null, result.rows);
       }
     }
   );
@@ -81,6 +46,6 @@ const deleteUsers = (id, callback) => {
 module.exports = {
   getUsers,
   insertUsers,
-  Users,
+  updateUsers,
   deleteUsers,
 };
