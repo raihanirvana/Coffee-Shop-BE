@@ -3,17 +3,9 @@ const userModel = require("../models/users.model");
 const getUsers = (req, res) => {
   userModel.getUsers((err, result) => {
     if (err) {
-      if (err.status === 400) {
-        res.status(400).json({
-          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
-        });
-        return;
-      } else {
-        res.status(500).json({
-          msg: "Internal server error",
-        });
-        return;
-      }
+      return res.status(500).json({
+        msg: "Internal server error",
+      });
     }
     res.status(200).json({
       data: result.rows,
@@ -38,7 +30,7 @@ const insertUsers = (req, res) => {
       }
     } else {
       res.status(201).json({
-        data: result,
+        data: body,
       });
     }
   });
@@ -49,20 +41,14 @@ const updateUsers = (req, res) => {
   const { body } = req;
   userModel.updateUsers(id, body, (err, result) => {
     if (err) {
-      console.error(err);
-      res.status(500).json({
+      console.log(err);
+      return res.status(500).json({
         message: "Internal server error",
       });
-      return;
-    }
-    if (result.rowCount === 0) {
-      res.status(404).json({
-        message: `Product with id ${id} not found`,
-      });
-      return;
     }
     res.status(200).json({
       message: "User updated successfully",
+      data: body,
     });
   });
 };
@@ -79,10 +65,12 @@ const deleteUsers = (req, res) => {
       }
     } else if (result === 0) {
       res.status(404).json({
-        error: "Product not found",
+        error: "Users not found",
       });
     } else {
-      res.status(204).send();
+      res.status(204).json({
+        msg: "delete user sucessesfull",
+      });
     }
   });
 };

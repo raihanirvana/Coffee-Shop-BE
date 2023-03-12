@@ -11,13 +11,13 @@ const getProduct = (req, res) => {
     }
     if (!result) {
       res.status(404).json({
-        msg: "History not found",
+        msg: "Product not found",
       });
       return;
     }
     if (result.rows.length === 0) {
       res.status(400).json({
-        msg: "No history data found",
+        msg: "No product data found",
       });
       return;
     }

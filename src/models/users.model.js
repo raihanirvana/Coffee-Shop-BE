@@ -2,27 +2,32 @@ const db = require("../configs/postgre");
 
 const getUsers = (callback) => {
   db.query(
-    "select id,email, display_name, birth from users order by id asc",
+    "select id,email, role, phone_number from users order by id asc",
     callback
   );
 };
 
 const insertUsers = (body, callback) => {
+  let sql =
+    "INSERT INTO users (email, pass, role, phone_number) VALUES ($1, $2, $3, $4)";
   db.query(
-    `insert into users(email,password,phone_number) values ('${body.email}','${body.password}','${body.phone_number}')`,
+    sql,
+    [body.email, body.pass, body.role, body.phone_number],
     (err, result) => {
       if (err) {
-        callback(err, null);
-      } else {
-        callback(null, result.rows);
+        return callback(err, null);
       }
+      callback(null, result.rows);
     }
   );
 };
 
 const updateUsers = (id, body, callback) => {
+  let sql =
+    "UPDATE users SET email = $1, pass = $2,role = $3, phone_number = $4 WHERE id = $5";
   db.query(
-    `UPDATE users SET email = '${body.email}', password = '${body.password}', phone_number = '${body.phone_number}' WHERE id = ${id}`,
+    sql,
+    [body.email, body.pass, body.role, body.phone_number, id],
     (err, result) => {
       if (err) {
         callback(err, null);

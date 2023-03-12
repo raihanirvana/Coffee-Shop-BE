@@ -1,34 +1,35 @@
 const db = require("../configs/postgre");
 
-const getPromo = (callback) => {
+const getPromo = (query, callback) => {
   db.query(
-    "select id,promo_name,coupon_code,expired from promo order by id asc",
+    "select id,code,discount,product_id from promos order by id asc",
     callback
   );
 };
 
 const insertPromo = (body, callback) => {
-  db.query(
-    `insert into promo(promo_name,coupon_code,expired) values ('${body.promo_name}','${body.coupon_code}','${body.expired}')`,
-    (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        callback(null, result.rows);
-      }
+  let sql =
+    "INSERT INTO promos (code, discount, product_id) VALUES ($1, $2, $3)";
+  db.query(sql, [body.code, body.discount, body.product_id], (err, result) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, result.rows);
     }
-  );
+  });
 };
 
 const updatePromo = (id, body, callback) => {
+  let sql =
+    "UPDATE promos SET code = $1, discount = $2, product_id = $3 WHERE id = $4";
   db.query(
-    `UPDATE promo SET promo_name = '${body.promo_name}', coupon_code = '${body.coupon_code}', expired = '${body.expired}' WHERE id = ${id}`,
+    sql,
+    [body.code, body.discount, body.product_id, id],
     (err, result) => {
       if (err) {
         callback(err, null);
-      } else {
-        callback(null, result.rows);
       }
+      callback(null, result.rows);
     }
   );
 };

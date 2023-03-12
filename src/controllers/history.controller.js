@@ -1,3 +1,4 @@
+const db = require("../configs/postgre");
 const historyModel = require("../models/history.model");
 
 const getHistory = (req, res) => {
@@ -31,27 +32,30 @@ const insertHistory = (req, res) => {
   const { body } = req;
   historyModel.insertHistory(body, (err, result) => {
     if (err) {
-      if (err.status === 300) {
-        res.status(300).json({
-          msg: "Custom error message for status code 300",
-        });
-        return;
-      } else if (err.status === 400) {
-        res.status(400).json({
-          msg: "Custom error message for status code 400",
-        });
-        return;
-      } else {
+      console.log(err);
+      res.status(500).json({
+        msg: "Internal server error",
+      });
+      return;
+    }
+    const sql = `SELECT p.product_name AS product, s.status_name AS status 
+                FROM history h 
+                JOIN products p ON p.id = h.product_id 
+                JOIN status s ON s.id = h.status_id 
+                WHERE h.product_id = ${body.product_id} 
+                AND h.status_id = ${body.status_id}`;
+    db.query(sql, (err, result) => {
+      if (err) {
+        console.log(err);
         res.status(500).json({
           msg: "Internal server error",
         });
         return;
       }
-    } else {
       res.status(201).json({
-        data: result,
+        data: result.rows,
       });
-    }
+    });
   });
 };
 
@@ -74,6 +78,7 @@ const updateHistory = (req, res) => {
     }
     res.status(200).json({
       message: "History updated successfully",
+      data: body,
     });
   });
 };
