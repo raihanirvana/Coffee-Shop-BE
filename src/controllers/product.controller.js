@@ -31,9 +31,17 @@ const insertProduct = (req, res) => {
   const { body } = req;
   productModel.insertProduct(body, (err, result) => {
     if (err) {
-      res.status(500).json({
-        msg: "internal server error",
-      });
+      if (err.status === 400) {
+        res.status(400).json({
+          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
+        });
+        return;
+      } else {
+        res.status(500).json({
+          msg: "Internal server error",
+        });
+        return;
+      }
     } else {
       res.status(201).json({
         data: result,

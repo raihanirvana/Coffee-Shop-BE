@@ -1,7 +1,7 @@
 const db = require("../configs/postgre");
 
 const getHistory = (params, callback) => {
-  let query = "SELECT id, name, price, status, tabelnamber FROM history";
+  let query = "SELECT id, name, price, status, table_number FROM history";
 
   // search filter
   if (params.search) {
@@ -16,7 +16,6 @@ const getHistory = (params, callback) => {
     } else {
       query += " ORDER BY id ASC";
     }
-
     // limit filter
     if (params.limit) {
       const limitQuery = parseInt(params.limit);
@@ -29,7 +28,7 @@ const getHistory = (params, callback) => {
 
 const insertHistory = (body, callback) => {
   db.query(
-    `insert into history(name,price,status,tabelnamber) values ('${body.name}',${body.price},'${body.status}','${body.tabelnamber}')`,
+    `insert into history(name,price,status,table_number) values ('${body.name}',${body.price},'${body.status}','${body.table_number}')`,
     (err, result) => {
       if (err) {
         callback(err, null);
@@ -42,7 +41,7 @@ const insertHistory = (body, callback) => {
 
 const updateHistory = (id, body, callback) => {
   db.query(
-    `UPDATE history SET name = '${body.name}', price = ${body.price}, tabelnamber = ${body.tabelnamber}, status = '${body.status}' WHERE id = ${id}`,
+    `UPDATE history SET name = '${body.name}', price = ${body.price}, table_number = ${body.table_number}, status = '${body.status}' WHERE id = ${id}`,
     (err, result) => {
       if (err) {
         callback(err, null);

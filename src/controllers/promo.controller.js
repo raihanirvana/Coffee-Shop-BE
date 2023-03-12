@@ -1,7 +1,8 @@
 const promoModel = require("../models/promo.model");
 
 const getPromo = (req, res) => {
-  promoModel.getPromo((err, result) => {
+  const { query } = req;
+  promoModel.getPromo(query, (err, result) => {
     if (err) {
       if (err.status === 300) {
         res.status(300).json({

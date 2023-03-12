@@ -2,7 +2,6 @@ const db = require("../configs/postgre");
 
 const getProduct = (params, callback) => {
   let query = "SELECT id, name, price, category_id FROM product";
-
   // search filter
   if (params.search) {
     const searchQuery = `%${params.search}%`;
@@ -27,7 +26,7 @@ const getProduct = (params, callback) => {
 
 const insertProduct = (body, callback) => {
   db.query(
-    `insert into product(name,price) values ('${body.name}',${body.price})`,
+    `insert into product (name,price,category_id) values ('${body.name}',${body.price},${body.category_id})`,
     (err, result) => {
       if (err) {
         callback(err, null);
@@ -37,7 +36,6 @@ const insertProduct = (body, callback) => {
     }
   );
 };
-
 const updateProduct = (id, body, callback) => {
   db.query(
     `UPDATE product SET name = '${body.name}', price = ${body.price} WHERE id = ${id}`,
