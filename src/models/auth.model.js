@@ -46,4 +46,21 @@ const registerALL = (body) => {
     );
   });
 };
-module.exports = { userVerification, getPassword, editPassword, registerALL };
+
+const getEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT email FROM users WHERE email = $1 LIMIT 1";
+    db.query(sql, [email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+module.exports = {
+  userVerification,
+  getPassword,
+  editPassword,
+  registerALL,
+  getEmail,
+};

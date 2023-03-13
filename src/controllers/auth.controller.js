@@ -82,9 +82,32 @@ const editPass = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { body } = req;
+  try {
+    const result = await authModels.getEmail(body.email);
+    const emailFromDb = result.rows[0].email;
+    if (body.email !== emailFromDb)
+      return res.status(403).json({
+        msg: "email anda tidak terdaftar",
+      });
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    console.log(`OTP untuk email ${emailFromDb} adalah: ${otp}`);
+    res.status(200).json({
+      msg: "OTP telah terkirim ke email anda",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   login,
   privateAcsess,
   editPass,
   register,
+  forgotPassword,
 };
