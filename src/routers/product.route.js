@@ -6,13 +6,17 @@ const { singleUpload } = require("../middlewares/diskUpload");
 const { checkToken } = require("../middlewares/auth.middleware");
 
 productRouter.get("/", productController.getProduct);
-// productRouter.post("/", productController.insertProduct);
-// productRouter.put("/:id", productController.updateProduct);
-// productRouter.delete("/:id", productController.deleteProduct);
+productRouter.post("/", singleUpload("image"), productController.insertProduct);
 productRouter.patch(
-  "/:productId",
-  checkToken,
+  "/:id",
   singleUpload("image"),
-  productController.patchImageProducts
+  productController.updateProduct
 );
+productRouter.delete("/:id", productController.deleteProduct);
+// productRouter.patch(
+//   "/:productId",
+//   checkToken,
+//   singleUpload("image"),
+//   productController.patchImageProducts
+// );
 module.exports = productRouter;

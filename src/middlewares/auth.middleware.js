@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../configs/environment");
+const authModels = require("../models/auth.model");
 
-const checkToken = (req, res, next) => {
+const checkToken = async (req, res, next) => {
   const bearerToken = req.header("authorization");
   console.log(bearerToken);
   if (!bearerToken)
@@ -9,6 +10,13 @@ const checkToken = (req, res, next) => {
       msg: "silahkan login terlebih dahulu",
     });
   const token = bearerToken.split(" ")[1];
+
+  const isBlacklisted = await authModels.isTokenBlacklisted(token); // memeriksa apakah token telah dimasukkan ke dalam daftar hitam
+  if (isBlacklisted)
+    return res.status(401).json({
+      msg: "Token tidak valid atau telah kedaluwarsa",
+    });
+
   jwt.verify(token, jwtSecret, (err, payload) => {
     if (err && err.name)
       return res.status(403).json({

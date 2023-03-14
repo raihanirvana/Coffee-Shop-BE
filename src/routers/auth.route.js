@@ -12,5 +12,6 @@ authRouter.post(
 authRouter.patch("/", authMiddleware.checkToken, authController.editPass);
 authRouter.post("/register", authController.register);
 authRouter.post("/forgotpass", authController.forgotPassword);
+authRouter.post("/logout", authMiddleware.checkToken, authController.logout);
 
 module.exports = authRouter;

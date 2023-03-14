@@ -68,53 +68,66 @@ const getMetaProducts = (params) => {
   });
 };
 
-// const insertProduct = (body, callback) => {
-//   db.query(
-//     `insert into product (name,price,category_id) values ('${body.name}',${body.price},${body.category_id})`,
-//     (err, result) => {
-//       if (err) {
-//         callback(err, null);
-//       } else {
-//         callback(null, result.rows);
-//       }
-//     }
-//   );
-// };
-// const updateProduct = (id, body, callback) => {
-//   db.query(
-//     `UPDATE product SET name = '${body.name}', price = ${body.price} WHERE id = ${id}`,
-//     (err, result) => {
-//       if (err) {
-//         callback(err, null);
-//       } else {
-//         callback(null, result.rows);
-//       }
-//     }
-//   );
-// };
+const insertProduct = (body, fileLink, callback) => {
+  const sql =
+    "insert into products (product_name,price,category_id,image) values ($1,$2,$3,$4)";
+  db.query(
+    sql,
+    [body.product_name, body.price, body.category_id, fileLink],
+    (err, result) => {
+      if (err) {
+        return callback(err, null);
+      }
+      callback(null, result.rows);
+    }
+  );
+};
 
-// const deleteProduct = (id, callback) => {
-//   db.query(`DELETE FROM product WHERE id = $1`, [id], (err, result) => {
-//     if (err) {
-//       callback(err, null);
-//     } else {
-//       callback(null, result.rowCount);
-//     }
-//   });
-// };
-
-const updateImageProducts = (fileLink, productId) => {
-  return new Promise((resolve, reject) => {
-    const sql = "UPDATE products SET image = $1 WHERE id = $2 RETURNING *";
-    db.query(sql, [fileLink, productId], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
+const updateProduct = (id, body, callback) => {
+  let updates = [];
+  let values = [];
+  Object.keys(body).forEach((key, index) => {
+    if (body[key] !== undefined) {
+      updates.push(`${key} = $${index + 1}`);
+      values.push(body[key]);
+    }
+  });
+  values.push(id);
+  const sql = `UPDATE products SET ${updates.join(", ")} WHERE id = $${
+    values.length
+  }`;
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, result.rows);
   });
 };
+
+const deleteProduct = (id, callback) => {
+  db.query(`DELETE FROM products WHERE id = $1`, [id], (err, result) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, result.rowCount);
+    }
+  });
+};
+
+// const updateImageProducts = (fileLink, productId) => {
+//   return new Promise((resolve, reject) => {
+//     const sql = "UPDATE products SET image = $1 WHERE id = $2 RETURNING *";
+//     db.query(sql, [fileLink, productId], (err, result) => {
+//       if (err) return reject(err);
+//       resolve(result);
+//     });
+//   });
+// };
 
 module.exports = {
   getProduct,
   getMetaProducts,
-  updateImageProducts,
+  insertProduct,
+  updateProduct,
+  deleteProduct,
 };

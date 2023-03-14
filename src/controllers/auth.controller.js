@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 const authModels = require("../models/auth.model");
 const { jwtSecret } = require("../configs/environment");
-const bycrpt = require("bcrypt");
+const bcrypt = require("bcrypt");
 
 const register = async (req, res) => {
   try {
     const { body } = req;
-    body.pass = await bycrpt.hash(body.pass, 10);
+    body.pass = await bcrypt.hash(body.pass, 10);
     await authModels.registerALL(body);
     res.status(200).json({
       data: body,
@@ -28,18 +28,34 @@ const login = async (req, res) => {
       return res.status(401).json({
         msg: "email/password salah",
       });
-    const isPasswordValid = await bycrpt.compare(
+    const isPasswordValid = await bcrypt.compare(
       body.pass,
       result.rows[0].pass
     );
     if (!isPasswordValid)
       return res.status(401).json({ msg: "email/password anda salah" });
-    jwt.sign(result.rows[0], jwtSecret, { expiresIn: "5m" }, (err, token) => {
-      if (err) throw err;
-      res.status(200).json({
-        msg: "selamat datang",
-        token,
-      });
+    const token = jwt.sign(result.rows[0], jwtSecret, { expiresIn: "5m" });
+    await authModels.storeToken(result.rows[0].id, token);
+    res.status(200).json({
+      msg: "selamat datang",
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: "internal server error",
+    });
+  }
+};
+
+const logout = async (req, res) => {
+  const { id } = req.authInfo;
+  try {
+    const token = req.headers.authorization.split(" ")[1]; // Mendapatkan token dari header permintaan
+    await authModels.deleteToken(id);
+    await authModels.addToBlacklist(token); // Menambahkan token ke daftar hitam
+    res.status(200).json({
+      msg: "logout berhasil",
     });
   } catch (error) {
     console.log(error);
@@ -66,10 +82,10 @@ const editPass = async (req, res) => {
     //   return res.status(403).json({
     //     msg: "password lama anda salah",
     //   });
-    isPasswordValid = await bycrpt.compare(body.oldPass, passFromDb);
+    isPasswordValid = await bcrypt.compare(body.oldPass, passFromDb);
     if (!isPasswordValid)
       return res.status(403).json({ msg: "password lama anda salah" });
-    const hashedPassword = await bycrpt.hash(body.newPassword, 10);
+    const hashedPassword = await bcrypt.hash(body.newPassword, 10);
     await authModels.editPassword(hashedPassword, authInfo.id);
     res.status(200).json({
       msg: "edit password success",
@@ -110,4 +126,5 @@ module.exports = {
   editPass,
   register,
   forgotPassword,
+  logout,
 };
