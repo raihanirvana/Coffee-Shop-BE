@@ -2,7 +2,7 @@ const db = require("../configs/postgre");
 
 const getUsers = (callback) => {
   db.query(
-    "select id,email, role, phone_number from users order by id asc",
+    "select id,email, role_id phone_number from users order by id asc",
     callback
   );
 };

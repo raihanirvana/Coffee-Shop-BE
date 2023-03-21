@@ -3,6 +3,7 @@ const userModel = require("../models/users.model");
 const getUsers = (req, res) => {
   userModel.getUsers((err, result) => {
     if (err) {
+      console.log(err);
       return res.status(500).json({
         msg: "Internal server error",
       });
