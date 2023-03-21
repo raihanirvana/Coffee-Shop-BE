@@ -5,7 +5,7 @@ const getUsers = (req, res) => {
     if (err) {
       console.log(err);
       return res.status(500).json({
-        msg: "Internal server error",
+        msg: "iki ngapa cok",
       });
     }
     res.status(200).json({

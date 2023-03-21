@@ -39,8 +39,9 @@ const insertProduct = (req, res) => {
         });
         return;
       } else {
+        console.log(err);
         res.status(500).json({
-          msg: "Internal server error",
+          msg: "iki ngapa cok",
         });
         return;
       }
