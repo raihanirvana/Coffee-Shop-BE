@@ -17,7 +17,11 @@ const limits = 2e6;
 const fileFilter = (req, file, cb) => {
   const pattern = /jpg|png/i;
   const ext = path.extname(file.originalname);
-  if (!pattern.test(ext)) return cb(null, false);
+  if (!pattern.test(ext)) {
+    const err = new Error("Only JPG and PNG files are allowed");
+    err.status = 400;
+    return cb(err, false);
+  }
   cb(null, true);
 };
 

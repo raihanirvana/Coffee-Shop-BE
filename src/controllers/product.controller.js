@@ -27,6 +27,11 @@ const insertProduct = (req, res) => {
   const fileLink = `/images/${req.file.filename}`;
   const { body } = req;
   productModel.insertProduct(body, fileLink, (err, result) => {
+    if (fileLink == undefined) {
+      return res.status(400).json({
+        msg: "tidak iso",
+      });
+    }
     if (err) {
       if (err.status === 400) {
         res.status(400).json({

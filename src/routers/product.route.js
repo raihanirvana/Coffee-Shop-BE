@@ -3,10 +3,16 @@ const productRouter = Router();
 const productController = require("../controllers/product.controller");
 
 const { singleUpload } = require("../middlewares/diskUpload");
-const { checkToken } = require("../middlewares/auth.middleware");
+const { checkToken, adminRole } = require("../middlewares/auth.middleware");
 
 productRouter.get("/", productController.getProduct);
-productRouter.post("/", singleUpload("image"), productController.insertProduct);
+productRouter.post(
+  "/",
+  checkToken,
+  adminRole,
+  singleUpload("image"),
+  productController.insertProduct
+);
 productRouter.patch(
   "/:id",
   singleUpload("image"),

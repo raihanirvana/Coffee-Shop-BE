@@ -10,13 +10,11 @@ const checkToken = async (req, res, next) => {
       msg: "silahkan login terlebih dahulu",
     });
   const token = bearerToken.split(" ")[1];
-
   const isBlacklisted = await authModels.isTokenBlacklisted(token); // memeriksa apakah token telah dimasukkan ke dalam daftar hitam
   if (isBlacklisted)
     return res.status(401).json({
       msg: "Token tidak valid atau telah kedaluwarsa",
     });
-
   jwt.verify(token, jwtSecret, (err, payload) => {
     if (err && err.name)
       return res.status(403).json({
@@ -27,8 +25,19 @@ const checkToken = async (req, res, next) => {
         msg: "internal server error",
       });
     req.authInfo = payload;
+    console.log(payload);
     next();
   });
 };
 
-module.exports = { checkToken };
+const adminRole = async (req, res, next) => {
+  const { role_id } = req.authInfo;
+  if (role_id !== 2) {
+    return res.status(403).json({
+      msg: "only admin can have this accsess",
+    });
+  }
+  next();
+};
+
+module.exports = { checkToken, adminRole };

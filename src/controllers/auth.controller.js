@@ -9,7 +9,6 @@ const register = async (req, res) => {
     body.pass = await bcrypt.hash(body.pass, 10);
     await authModels.registerALL(body);
     res.status(200).json({
-      data: body,
       msg: "register berhasil",
     });
   } catch (error) {
@@ -37,7 +36,7 @@ const login = async (req, res) => {
     const token = jwt.sign(result.rows[0], jwtSecret, { expiresIn: "5m" });
     await authModels.storeToken(result.rows[0].id, token);
     res.status(200).json({
-      msg: "selamat datang",
+      msg: "selamat datang ditoko kopi gacoan",
       token,
     });
   } catch (error) {
@@ -110,7 +109,7 @@ const forgotPassword = async (req, res) => {
     const otp = Math.floor(1000 + Math.random() * 9000);
     console.log(`OTP untuk email ${emailFromDb} adalah: ${otp}`);
     res.status(200).json({
-      msg: "OTP telah terkirim ke email anda",
+      msg: "OTP telah terkirim, silahkan cek email anda!",
     });
   } catch (error) {
     console.log(error);

@@ -2,7 +2,7 @@ const db = require("../configs/postgre");
 
 const userVerification = (body) => {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT id, pass FROM users WHERE email = $1";
+    const sql = "SELECT id, email,role_id,pass FROM users WHERE email = $1";
     db.query(sql, [body.email], (err, result) => {
       if (err) {
         return reject(err);
@@ -80,24 +80,20 @@ const editPassword = (newPassword, userId) => {
   });
 };
 
-const registerALL = (body) => {
+const register = (body) => {
   return new Promise((resolve, reject) => {
     const sql =
-      "INSERT INTO users (email,pass,role,phone_number) VALUES ($1,$2,$3,$4)";
-    db.query(
-      sql,
-      [body.email, body.pass, body.role, body.phone_number],
-      (err, result) => {
-        if (err) reject(err);
-        resolve(result);
-      }
-    );
+      "INSERT INTO users (email, pass, role_id, phone_number) VALUES ($1, $2, 1, $3)";
+    db.query(sql, [body.email, body.pass, body.phone_number], (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
   });
 };
 
 const getEmail = (email) => {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT email FROM users WHERE email = $1 LIMIT 1";
+    const sql = "SELECT email FROM users WHERE email = $1";
     db.query(sql, [email], (err, result) => {
       if (err) return reject(err);
       resolve(result);
@@ -109,7 +105,7 @@ module.exports = {
   userVerification,
   getPassword,
   editPassword,
-  registerALL,
+  register,
   getEmail,
   storeToken,
   deleteToken,
