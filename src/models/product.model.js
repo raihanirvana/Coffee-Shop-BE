@@ -5,20 +5,17 @@ const getProduct = (params) => {
     let query =
       "select p.id, p.product_name, p.price, c.category_name from products p join categories c on c.id = p.category_id";
     let queryParams = [];
-    // search filter
     if (params.search) {
       const searchQuery = `%${params.search}%`;
       query += " WHERE product_name ILIKE $1";
       queryParams.push(searchQuery);
     }
-    // sort filter
     if (params.sort) {
       const sortQuery = params.sort === "asc" ? "ASC" : "DESC";
       query += ` ORDER BY p.id ${sortQuery}`;
     } else {
       query += " ORDER BY p.id ASC";
     }
-    // limit filter
     if (params.limit) {
       const limitQuery = parseInt(params.limit);
       query += ` LIMIT $${queryParams.length + 1}`;
@@ -87,6 +84,7 @@ const updateProduct = (id, body, callback) => {
   let updates = [];
   let values = [];
   Object.keys(body).forEach((key, index) => {
+    console.log(body[key]);
     if (body[key] !== undefined) {
       updates.push(`${key} = $${index + 1}`);
       values.push(body[key]);
@@ -100,6 +98,7 @@ const updateProduct = (id, body, callback) => {
     if (err) {
       return callback(err, null);
     }
+    console.log(sql);
     callback(null, result.rows);
   });
 };
@@ -108,21 +107,10 @@ const deleteProduct = (id, callback) => {
   db.query(`DELETE FROM products WHERE id = $1`, [id], (err, result) => {
     if (err) {
       callback(err, null);
-    } else {
-      callback(null, result.rowCount);
     }
+    callback(null, result.rowCount);
   });
 };
-
-// const updateImageProducts = (fileLink, productId) => {
-//   return new Promise((resolve, reject) => {
-//     const sql = "UPDATE products SET image = $1 WHERE id = $2 RETURNING *";
-//     db.query(sql, [fileLink, productId], (err, result) => {
-//       if (err) return reject(err);
-//       resolve(result);
-//     });
-//   });
-// };
 
 module.exports = {
   getProduct,

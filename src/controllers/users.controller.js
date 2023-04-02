@@ -1,55 +1,65 @@
 const userModel = require("../models/users.model");
+const bcrypt = require("bcrypt");
+const { user } = require("../configs/environment");
 
-const getUsers = (req, res) => {
-  userModel.getUsers((err, result) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({
-        msg: "iki ngapa cok",
+const getUsers = async (req, res) => {
+  try {
+    const { query } = req;
+    const { rows } = await userModel.getUsers(query);
+    if (rows.length === 0) {
+      res.status(404).json({
+        msg: "Users not found",
       });
+      return;
     }
+    const meta = await userModel.getMetaUsers(query);
     res.status(200).json({
-      data: result.rows,
+      data: rows,
+      meta,
     });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      msg: "internal server error",
+    });
+  }
 };
 
 const insertUsers = (req, res) => {
   const { body } = req;
   userModel.insertUsers(body, (err, result) => {
     if (err) {
-      if (err.status === 400) {
-        res.status(400).json({
-          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
-        });
-        return;
-      } else {
-        res.status(500).json({
-          msg: "Internal server error",
-        });
-        return;
-      }
-    } else {
-      res.status(201).json({
-        data: body,
+      return res.status(500).json({
+        msg: "Email/Phone Number sudah terdaftar/Internal Server Sedang Error, Silahkan Coba Beberapa Saat Lagi",
       });
     }
+    res.status(200).json({
+      msg: "Insert User Berhasil",
+      data: body,
+    });
   });
 };
 
 const updateUsers = (req, res) => {
   const { id } = req.params;
   const { body } = req;
-  userModel.updateUsers(id, body, (err, result) => {
+  bcrypt.hash(body.pass, 10, (err, hash) => {
     if (err) {
-      console.log(err);
       return res.status(500).json({
-        message: "Internal server error",
+        msg: "internal server error",
       });
     }
-    res.status(200).json({
-      message: "User updated successfully",
-      data: body,
+    userModel.updateUsers(id, body, hash, (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          msg: "internal server error",
+        });
+      }
+      delete body.pass;
+      res.status(200).json({
+        msg: "User berhasil di update",
+        data: body,
+      });
     });
   });
 };
@@ -58,21 +68,19 @@ const deleteUsers = (req, res) => {
   const { id } = req.params;
   userModel.deleteUsers(id, (err, result) => {
     if (err) {
-      if (err.status === 400) {
-        res.status(400).json({
-          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
-        });
-        return;
-      }
-    } else if (result === 0) {
-      res.status(404).json({
-        error: "Users not found",
-      });
-    } else {
-      res.status(204).json({
-        msg: "delete user sucessesfull",
+      return res.status(404).json({
+        msg: "id tidak ditemukan",
       });
     }
+    if (err) {
+      return res.status(500).json({
+        msg: "internal server error",
+      });
+    }
+    console.log(result.rows);
+    res.status(200).json({
+      msg: "Delete user berhasil",
+    });
   });
 };
 

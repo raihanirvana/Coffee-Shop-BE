@@ -7,7 +7,7 @@ const register = async (req, res) => {
   try {
     const { body } = req;
     body.pass = await bcrypt.hash(body.pass, 10);
-    await authModels.registerALL(body);
+    await authModels.register(body);
     res.status(200).json({
       msg: "register berhasil",
     });
@@ -23,6 +23,7 @@ const login = async (req, res) => {
   try {
     const { body } = req;
     const result = await authModels.userVerification(body);
+    console.log(body);
     if (result.rows.length < 1)
       return res.status(401).json({
         msg: "email/password salah",
@@ -34,7 +35,6 @@ const login = async (req, res) => {
     if (!isPasswordValid)
       return res.status(401).json({ msg: "email/password anda salah" });
     const token = jwt.sign(result.rows[0], jwtSecret, { expiresIn: "5m" });
-    await authModels.storeToken(result.rows[0].id, token);
     res.status(200).json({
       msg: "selamat datang ditoko kopi gacoan",
       token,
@@ -48,10 +48,8 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  const { id } = req.authInfo;
   try {
     const token = req.headers.authorization.split(" ")[1]; // Mendapatkan token dari header permintaan
-    await authModels.deleteToken(id);
     await authModels.addToBlacklist(token); // Menambahkan token ke daftar hitam
     res.status(200).json({
       msg: "logout berhasil",
@@ -102,19 +100,53 @@ const forgotPassword = async (req, res) => {
   try {
     const result = await authModels.getEmail(body.email);
     const emailFromDb = result.rows[0].email;
-    if (body.email !== emailFromDb)
+    if (body.email !== emailFromDb) {
       return res.status(403).json({
-        msg: "email anda tidak terdaftar",
+        msg: "Email anda tidak terdaftar",
       });
+    }
     const otp = Math.floor(1000 + Math.random() * 9000);
+    const otp_expiration = new Date(Date.now() + 5 * 60 * 1000); // 5 menit dari sekarang
     console.log(`OTP untuk email ${emailFromDb} adalah: ${otp}`);
+    await authModels.addOTP(otp, otp_expiration, body.email);
     res.status(200).json({
       msg: "OTP telah terkirim, silahkan cek email anda!",
     });
   } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Terjadi kesalahan pada server",
+    });
+  }
+};
+
+const changePass = async (req, res) => {
+  const { body } = req;
+  try {
+    const otpResult = await authModels.getOTP(body.email);
+    const otp = otpResult.rows[0].otp;
+    console.log(otp);
+    if (otp !== body.otp)
+      return res.status(403).json({
+        msg: "otp yang anda masukan salah",
+      });
+    const dbOTPExpiration = otpResult.rows[0].otp_expiration;
+    const dbOTPExpirationDateTime = new Date(dbOTPExpiration);
+    const currentDateTime = new Date();
+    if (currentDateTime > dbOTPExpirationDateTime) {
+      return res.status(403).json({
+        msg: "OTP tidak valid atau telah kadaluarsa",
+      });
+    }
+    const hashedPassword = await bcrypt.hash(body.newPass, 10);
+    await authModels.changeForgotpass(body.email, hashedPassword);
+    res.status(200).json({
+      msg: "Ubah Password Berhasil",
+    });
+  } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: "Internal server error",
+      msg: "internal server error",
     });
   }
 };
@@ -126,4 +158,5 @@ module.exports = {
   register,
   forgotPassword,
   logout,
+  changePass,
 };

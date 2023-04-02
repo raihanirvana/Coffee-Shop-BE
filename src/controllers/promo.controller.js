@@ -54,24 +54,17 @@ const deletePromo = (req, res) => {
   const { id } = req.params;
   promoModel.deletePromo(id, (err, result) => {
     if (err) {
-      if (err.status === 400) {
-        res.status(400).json({
-          msg: "the server cannot or will not process the request due to something that is perceived to be a client error",
-        });
-        return;
-      } else {
-        res.status(500).json({
-          error: "Internal server error",
-        });
-        return;
-      }
-    } else if (result === 0) {
+      res.status(500).json({
+        error: "Internal server error",
+      });
+      return;
+    }
+    if (result === 0) {
       res.status(404).json({
         error: "Product not found",
       });
-    } else {
-      res.status(204).send();
     }
+    res.status(204).send();
   });
 };
 

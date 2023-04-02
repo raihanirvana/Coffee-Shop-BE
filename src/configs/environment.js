@@ -6,4 +6,11 @@ module.exports = {
   pwd: process.env.DB_PWD,
   serverPort: process.env.SERVER_PORT,
   jwtSecret: process.env.SECRETKEY,
+  mongoPass: process.env.MONGO_PASS,
+  mongoDbName: process.env.MONGO_DBNAME,
+  mongoDbHost: process.env.MONGO_HOST,
+  mongoDbUser: process.env.MONGO_USER,
+  cloudinaryName: process.env.CLOUD_NAME,
+  cloudinaryKey: process.env.CLOUD_KEY,
+  cloudinarySecret: process.env.CLOUD_SECRET,
 };

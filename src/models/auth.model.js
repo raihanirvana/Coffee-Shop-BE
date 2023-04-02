@@ -12,29 +12,29 @@ const userVerification = (body) => {
   });
 };
 
-const storeToken = (userId, token) => {
-  return new Promise((resolve, reject) => {
-    const sql = "UPDATE users SET token = $1 WHERE id = $2";
-    db.query(sql, [token, userId], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(result);
-    });
-  });
-};
+// const storeToken = (userId, token) => {
+//   return new Promise((resolve, reject) => {
+//     const sql = "UPDATE users SET token = $1 WHERE id = $2";
+//     db.query(sql, [token, userId], (err, result) => {
+//       if (err) {
+//         return reject(err);
+//       }
+//       resolve(result);
+//     });
+//   });
+// };
 
-const deleteToken = (id) => {
-  return new Promise((resolve, reject) => {
-    const sql = "UPDATE users SET token = null WHERE id = $1";
-    db.query(sql, [id], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(result);
-    });
-  });
-};
+// const deleteToken = (id) => {
+//   return new Promise((resolve, reject) => {
+//     const sql = "UPDATE users SET token = null WHERE id = $1";
+//     db.query(sql, [id], (err, result) => {
+//       if (err) {
+//         return reject(err);
+//       }
+//       resolve(result);
+//     });
+//   });
+// };
 
 const addToBlacklist = (token) => {
   return new Promise((resolve, reject) => {
@@ -101,14 +101,53 @@ const getEmail = (email) => {
   });
 };
 
+const addOTP = (otp, otp_expiration, email) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      "UPDATE users SET otp = $1, otp_expiration = $2 WHERE email = $3";
+    db.query(sql, [otp, otp_expiration, email], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result);
+    });
+  });
+};
+
+const getOTP = (email) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      "SELECT otp, otp_expiration FROM users WHERE email = $1 AND otp_expiration >= NOW()";
+    db.query(sql, [email], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result);
+    });
+  });
+};
+
+const changeForgotpass = (email, hashedPassword) => {
+  return new Promise((resolve, reject) => {
+    const sql = "UPDATE users SET pass = $1 WHERE email = $2";
+    db.query(sql, [hashedPassword, email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
 module.exports = {
   userVerification,
   getPassword,
   editPassword,
   register,
   getEmail,
-  storeToken,
-  deleteToken,
+  // storeToken,
+  // deleteToken,
   isTokenBlacklisted,
   addToBlacklist,
+  addOTP,
+  getOTP,
+  changeForgotpass,
 };
