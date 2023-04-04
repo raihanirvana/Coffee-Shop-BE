@@ -1,4 +1,5 @@
 const productModel = require("../models/product.model");
+const { uploader } = require("../utils/cloudinary");
 
 const getProduct = async (req, res) => {
   try {
@@ -53,15 +54,25 @@ const insertProduct = (req, res) => {
   });
 };
 
-const updateProduct = (req, res) => {
+const updateProduct = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
-  const fileLink = req.file ? `/images/${req.file.filename}` : null;
   const updateFields = {};
   if (body.product_name) updateFields.product_name = body.product_name;
   if (body.price) updateFields.price = body.price;
   if (body.category_id) updateFields.category_id = body.category_id;
-  if (fileLink) updateFields.image = fileLink;
+  if (body.image) {
+    const uploadResult = await uploader(req, "product-image", id);
+    if (uploadResult.data) {
+      updateFields.image = uploadResult.data.secure_url;
+    } else {
+      console.error(uploadResult.err);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+      return;
+    }
+  }
   productModel.updateProduct(id, updateFields, (err, result) => {
     if (err) {
       console.error(err);

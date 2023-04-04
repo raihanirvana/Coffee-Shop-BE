@@ -38,6 +38,7 @@ const login = async (req, res) => {
     res.status(200).json({
       msg: "selamat datang ditoko kopi gacoan",
       token,
+      id: result.rows[0].id,
     });
   } catch (error) {
     console.log(error);
@@ -71,9 +72,9 @@ const privateAcsess = (req, res) => {
 };
 
 const editPass = async (req, res) => {
-  const { authInfo, body } = req;
+  const { body } = req;
   try {
-    const result = await authModels.getPassword(authInfo.id);
+    const result = await authModels.getPassword(body);
     const passFromDb = result.rows[0].pass;
     // if (body.oldPass !== passFromDb)
     //   return res.status(403).json({
@@ -83,7 +84,7 @@ const editPass = async (req, res) => {
     if (!isPasswordValid)
       return res.status(403).json({ msg: "password lama anda salah" });
     const hashedPassword = await bcrypt.hash(body.newPassword, 10);
-    await authModels.editPassword(hashedPassword, authInfo.id);
+    await authModels.editPassword(hashedPassword, body);
     res.status(200).json({
       msg: "edit password success",
     });

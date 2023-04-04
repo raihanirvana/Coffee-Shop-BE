@@ -3,16 +3,34 @@ const db = require("../configs/postgre");
 const getProduct = (params) => {
   return new Promise((resolve, reject) => {
     let query =
-      "select p.id, p.product_name, p.price, c.category_name from products p join categories c on c.id = p.category_id";
+      "select p.id, p.product_name, p.price, c.category_name,p.image from products p join categories c on c.id = p.category_id";
     let queryParams = [];
     if (params.search) {
       const searchQuery = `%${params.search}%`;
       query += " WHERE product_name ILIKE $1";
       queryParams.push(searchQuery);
     }
+    if (params.category) {
+      query += " WHERE c.id = $1";
+      queryParams.push(params.category);
+    }
     if (params.sort) {
-      const sortQuery = params.sort === "asc" ? "ASC" : "DESC";
-      query += ` ORDER BY p.id ${sortQuery}`;
+      switch (params.sort) {
+        case "cheapest":
+          query += " ORDER BY p.price ASC";
+          break;
+        case "priciest":
+          query += " ORDER BY p.price DESC";
+          break;
+        case "newest":
+          query += " ORDER BY p.id DESC";
+          break;
+        case "latest":
+          query += " ORDER BY p.id ASC";
+          break;
+        default:
+          query += " ORDER BY p.id ASC";
+      }
     } else {
       query += " ORDER BY p.id ASC";
     }

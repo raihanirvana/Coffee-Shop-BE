@@ -60,20 +60,20 @@ const isTokenBlacklisted = (token) => {
   });
 };
 
-const getPassword = (userId) => {
+const getPassword = (body) => {
   return new Promise((resolve, reject) => {
     const sql = "SELECT u.pass FROM users u WHERE id = $1";
-    db.query(sql, [userId], (err, result) => {
+    db.query(sql, [body.id], (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
   });
 };
 
-const editPassword = (newPassword, userId) => {
+const editPassword = (newPassword, body) => {
   return new Promise((resolve, reject) => {
     const sql = "UPDATE users SET pass = $1 WHERE id = $2";
-    db.query(sql, [newPassword, userId], (err, result) => {
+    db.query(sql, [newPassword, body.id], (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });

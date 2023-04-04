@@ -8,5 +8,10 @@ profileRoute.post(
   authMiddleware.checkToken,
   profileController.insertProfile
 );
+profileRoute.patch(
+  "/updateProfile",
+  authMiddleware.checkToken,
+  profileController.updateProfileController
+);
 
 module.exports = profileRoute;

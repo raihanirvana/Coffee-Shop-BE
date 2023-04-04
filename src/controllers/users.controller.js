@@ -1,6 +1,4 @@
 const userModel = require("../models/users.model");
-const bcrypt = require("bcrypt");
-const { user } = require("../configs/environment");
 
 const getUsers = async (req, res) => {
   try {
@@ -40,26 +38,33 @@ const insertUsers = (req, res) => {
   });
 };
 
-const updateUsers = (req, res) => {
+const updateUser = (req, res) => {
   const { id } = req.params;
   const { body } = req;
-  bcrypt.hash(body.pass, 10, (err, hash) => {
+  const updateFields = {};
+  if (body.email) updateFields.email = body.email;
+  if (body.phone_number) updateFields.phone_number = body.phone_number;
+  if (body.first_name) updateFields.first_name = body.first_name;
+  if (body.last_name) updateFields.last_name = body.last_name;
+  if (body.display_name) updateFields.display_name = body.display_name;
+  if (body.birthday) updateFields.birthday = body.birthday;
+  if (body.address) updateFields.address = body.address;
+  userModel.updateUsers(id, updateFields, (err, result) => {
     if (err) {
-      return res.status(500).json({
-        msg: "internal server error",
+      console.error(err);
+      res.status(500).json({
+        message: "Internal server error",
       });
+      return;
     }
-    userModel.updateUsers(id, body, hash, (err, result) => {
-      if (err) {
-        return res.status(500).json({
-          msg: "internal server error",
-        });
-      }
-      delete body.pass;
-      res.status(200).json({
-        msg: "User berhasil di update",
-        data: body,
+    if (result.rowCount === 0) {
+      res.status(404).json({
+        message: `Profile with id ${authInfo.id} not found`,
       });
+      return;
+    }
+    res.status(200).json({
+      message: "Profile updated successfully",
     });
   });
 };
@@ -87,6 +92,6 @@ const deleteUsers = (req, res) => {
 module.exports = {
   getUsers,
   insertUsers,
-  updateUsers,
+  updateUser,
   deleteUsers,
 };

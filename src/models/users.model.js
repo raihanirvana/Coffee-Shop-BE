@@ -3,20 +3,20 @@ const db = require("../configs/postgre");
 const getUsers = (params) => {
   return new Promise((resolve, reject) => {
     let query =
-      "SELECT users.email, u.first_name, u.last_name, u.display_name, u.address, users.phone_number FROM users JOIN userdata u  ON users.id = u.user_id ";
+      "SELECT id,email,phone_number,first_name,last_name,address,display_name,birthday,gender from users";
     let queryParams = [];
     // search filter
-    if (params.search) {
-      const searchQuery = `%${params.search}%`;
-      query += " WHERE email ILIKE $1";
-      queryParams.push(searchQuery);
+    if (params.userId) {
+      const userIdQuery = parseInt(params.userId);
+      query += " WHERE id = $1";
+      queryParams.push(userIdQuery);
     }
     // sort filter
     if (params.sort) {
       const sortQuery = params.sort === "asc" ? "ASC" : "DESC";
-      query += ` ORDER BY u.user_id ${sortQuery}`;
+      query += ` ORDER BY id ${sortQuery}`;
     } else {
-      query += " ORDER BY u.user_id ASC";
+      query += " ORDER BY id ASC";
     }
     // limit filter
     if (params.limit) {
@@ -79,15 +79,26 @@ const getMetaUsers = (params) => {
   });
 };
 
-const updateUsers = (id, body, hash, callback) => {
-  let sql =
-    "UPDATE users SET email = $1, pass = $2, role_id = 1, phone_number = $3 WHERE id = $4";
-  db.query(sql, [body.email, hash, body.phone_number, id], (err, result) => {
-    if (err) {
-      callback(err, null);
-    } else {
-      callback(null, result.rows);
+updateUsers = (id, body, callback) => {
+  let updates = [];
+  let values = [];
+  Object.keys(body).forEach((key, index) => {
+    console.log(body[key]);
+    if (body[key] !== undefined) {
+      updates.push(`${key} = $${index + 1}`);
+      values.push(body[key]);
     }
+  });
+  values.push(id);
+  const sql = `UPDATE users SET ${updates.join(", ")} WHERE id = $${
+    values.length
+  }`;
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      return callback(err, null);
+    }
+    console.log(sql);
+    callback(null, result.rows);
   });
 };
 

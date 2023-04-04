@@ -1,8 +1,19 @@
 const { Router } = require("express");
-const welcomeRouter = Router();
 
 const welcomeController = require("../controllers/welcome.controller");
+const memoryUpload = require("../middlewares/memoryUpload");
+const { checkToken } = require("../middlewares/auth.middleware");
 
+const welcomeRouter = Router();
+
+// localhost/
 welcomeRouter.get("/", welcomeController.welcomePage);
+
+welcomeRouter.post(
+  "/",
+  checkToken,
+  memoryUpload.single("image"),
+  welcomeController.cloudUpload
+);
 
 module.exports = welcomeRouter;
