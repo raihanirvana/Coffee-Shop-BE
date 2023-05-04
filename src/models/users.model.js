@@ -3,7 +3,7 @@ const db = require("../configs/postgre");
 const getUsers = (params) => {
   return new Promise((resolve, reject) => {
     let query =
-      "SELECT id,email,phone_number,first_name,last_name,address,display_name,birthday,gender from users";
+      "SELECT id,email,phone_number,first_name,last_name,address,display_name,birthday,gender,image from users";
     let queryParams = [];
     // search filter
     if (params.userId) {
@@ -101,7 +101,6 @@ updateUsers = (id, body, callback) => {
     callback(null, result.rows);
   });
 };
-
 const deleteUsers = (id, callback) => {
   db.query(`DELETE FROM users WHERE id = $1`, [id], (err, result) => {
     if (err) {

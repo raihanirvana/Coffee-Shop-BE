@@ -1,4 +1,5 @@
 const userModel = require("../models/users.model");
+const { uploader } = require("../utils/cloudinary");
 
 const getUsers = async (req, res) => {
   try {
@@ -36,6 +37,23 @@ const insertUsers = (req, res) => {
       data: body,
     });
   });
+};
+
+const cloudUpload = async (req, res) => {
+  try {
+    // upload ke cloud
+    const { params } = req;
+    const { data, err, msg } = await uploader(req, "product", params.id);
+    if (err) throw { msg, err };
+    if (!data) return res.status(200).json({ msg: "No File Uploaded" });
+    return data;
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({
+      msg: "Internal Server Error",
+    });
+  }
+  // console.log(error)
 };
 
 const updateUser = (req, res) => {
@@ -94,4 +112,5 @@ module.exports = {
   insertUsers,
   updateUser,
   deleteUsers,
+  cloudUpload,
 };
