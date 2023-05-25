@@ -1,4 +1,5 @@
-<img src="https://skillicons.dev/icons?i=react,next,javascript,html,css,redux,tailwind,vercel" />
+<div align="center">
+<img src="https://skillicons.dev/icons?i=nodejs,javascript,html,vercel,mongodb," />
 
   <p align="center">
     <a href="https://backend-week5.vercel.app/">View Demo</a>
