@@ -9,6 +9,7 @@ const createTransaction = async (req, res) => {
     await client.query("BEGIN");
     const result = await transactionsModel.createTransaction(client, body, id);
     const transactionId = result.rows[0].id;
+    transactionsModel.insertHistory(client, body, id);
     await transactionsModel.createDetailTransaction(
       client,
       body,
@@ -28,10 +29,25 @@ const createTransaction = async (req, res) => {
     console.log(error);
     await client.query("ROLLBACK");
     client.release();
+    console.log(error);
     res.status(500).json({
       msg: "Internal Server Error",
     });
   }
 };
 
-module.exports = { createTransaction };
+const getHistoryHandler = async (req, res) => {
+  const { id } = req.authInfo;
+  try {
+    const result = await transactionsModel.getHistory(id);
+    res.status(200).json({
+      result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "internal server error",
+    });
+    console.log(error);
+  }
+};
+module.exports = { createTransaction, getHistoryHandler };

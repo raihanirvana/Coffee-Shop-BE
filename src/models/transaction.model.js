@@ -1,3 +1,5 @@
+const { db } = require("../configs/environment");
+
 const createTransaction = (client, body, id) => {
   return new Promise((resolve, reject) => {
     const { note, status_id, promo_id, payment_id, delivery_id } = body;
@@ -32,6 +34,25 @@ const createDetailTransaction = (client, body, transactionId) => {
   });
 };
 
+const insertHistory = (client, body, id) => {
+  return new Promise((resolve, reject) => {
+    const { products } = body;
+    let sql =
+      "INSERT INTO history (product_id, status_id, table_name, user_id) VALUES ";
+    let values = [];
+    products.forEach((product, i) => {
+      const { product_id, status_id, table_name } = product;
+      if (values.length) sql += ", ";
+      sql += `($${1 + 4 * i}, $${2 + 4 * i}, $${3 + 4 * i}, $${4 + 4 * i})`;
+      values.push(product_id, status_id, table_name, id);
+    });
+    client.query(sql, values, (err) => {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
+};
+
 const getTransaction = (client, transactionId) => {
   return new Promise((resolve, reject) => {
     const sql = `select u.email, u.address, p."product_name" as "product", s."size" as "size", pr.code as "promo", py."payment" as "payment_method", 
@@ -51,4 +72,9 @@ const getTransaction = (client, transactionId) => {
   });
 };
 
-module.exports = { createTransaction, createDetailTransaction, getTransaction };
+module.exports = {
+  createTransaction,
+  createDetailTransaction,
+  getTransaction,
+  insertHistory,
+};

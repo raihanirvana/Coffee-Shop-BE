@@ -9,11 +9,12 @@ const welcomeRouter = Router();
 // localhost/
 welcomeRouter.get("/", welcomeController.welcomePage);
 
-welcomeRouter.post(
+welcomeRouter.patch(
   "/",
   checkToken,
   memoryUpload.single("image"),
-  welcomeController.cloudUpload
+  welcomeController.cloudUpload,
+  welcomeController.updateProfileController
 );
 
 module.exports = welcomeRouter;

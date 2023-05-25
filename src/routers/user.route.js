@@ -4,7 +4,11 @@ const usersController = require("../controllers/users.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 const memoryUpload = require("../middlewares/memoryUpload");
 
-usersRouter.get("/", usersController.getUsers);
+usersRouter.get(
+  "/",
+  authMiddleware.checkToken,
+  usersController.getUsersHandler
+);
 usersRouter.post("/", usersController.insertUsers);
 usersRouter.patch(
   "/updateUser/:id",

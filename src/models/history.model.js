@@ -1,29 +1,41 @@
 const db = require("../configs/postgre");
 
-const getHistory = (params, callback) => {
-  let query =
-    "SELECT p.product_name AS product, s.status_name AS status FROM history h JOIN products p ON p.id = h.product_id JOIN status s ON s.id = h.status_id";
-  let queryParams = [];
-  // search filter
-  if (params.search) {
-    const searchQuery = `%${params.search}%`;
-    query += " WHERE p.product_name ILIKE $1 OR s.status_name ILIKE $1";
-    queryParams.push(searchQuery);
-  }
-  // sort filter
-  if (params.sort) {
-    const sortQuery = params.sort === "asc" ? "ASC" : "DESC";
-    query += ` ORDER BY h.id ${sortQuery}`;
-  } else {
-    query += " ORDER BY h.id ASC";
-  }
-  // limit filter
-  if (params.limit) {
-    const limitQuery = parseInt(params.limit);
-    query += ` LIMIT $${queryParams.length + 1}`;
-    queryParams.push(limitQuery);
-  }
-  db.query(query, queryParams, callback);
+const getHistory = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT h.*, p.product_name, p.price, p.image, s.status_name
+    FROM history h
+    JOIN products p ON h.product_id = p.id
+    JOIN status s ON h.status_id = s.id
+    WHERE h.user_id = $1;`;
+    db.query(sql, [id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+const manageOrder = () => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT h.*, p.product_name, p.price, p.image, s.status_name
+    FROM history h
+    JOIN products p ON h.product_id = p.id
+    JOIN status s ON h.status_id = s.id
+    WHERE h.status_id = 1`;
+    db.query(sql, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+const patchStatusById = (id, status_id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `UPDATE history SET status_id = $1 WHERE id = $2`;
+    db.query(sql, [status_id, id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
 };
 
 const insertHistory = (body, callback) => {
@@ -72,4 +84,6 @@ module.exports = {
   insertHistory,
   updateHistory,
   deleteHistory,
+  manageOrder,
+  patchStatusById,
 };

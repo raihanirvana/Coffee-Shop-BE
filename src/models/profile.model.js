@@ -24,7 +24,7 @@ const inputProfile = (id, body) => {
   });
 };
 
-updateProfile = (id, body, callback) => {
+const updateProfile = (id, body, callback) => {
   let updates = [];
   let values = [];
   Object.keys(body).forEach((key, index) => {
@@ -35,7 +35,7 @@ updateProfile = (id, body, callback) => {
     }
   });
   values.push(id);
-  const sql = `UPDATE userdata SET ${updates.join(", ")} WHERE user_id = $${
+  const sql = `UPDATE users SET ${updates.join(", ")} WHERE id = $${
     values.length
   }`;
   db.query(sql, values, (err, result) => {

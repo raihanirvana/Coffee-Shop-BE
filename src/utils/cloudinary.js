@@ -2,22 +2,22 @@ const cloudinary = require("../configs/cloudinary");
 const path = require("path");
 const dataUriParser = require("datauri/parser");
 
-const uploader = async (req, prefix, id) => {
-  const { file } = req;
-  if (!file) return { data: null };
+const uploader = async (file, prefix, id) => {
+  if (!file) return { secure_url: null };
   const buffer = file.buffer;
   const ext = path.extname(file.originalname).toString();
   const parser = new dataUriParser();
   const datauri = parser.format(ext, buffer);
-  const filename = `${prefix}-${file.fieldname}-${id}`;
+  const timestamp = Date.now();
+  const filename = `${prefix}-${file.fieldname}-${id}-${timestamp}`;
   try {
     const result = await cloudinary.uploader.upload(datauri.content, {
       public_id: filename,
       folder: "kopi_toko",
     });
-    return { data: result, msg: "OK" };
+    return { secure_url: result.secure_url };
   } catch (err) {
-    return { data: null, msg: "Upload Failed", err };
+    return { secure_url: null };
   }
 };
 

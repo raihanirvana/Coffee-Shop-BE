@@ -1,42 +1,52 @@
 const userModel = require("../models/users.model");
 const { uploader } = require("../utils/cloudinary");
 
-const getUsers = async (req, res) => {
+const getUsersHandler = async (req, res) => {
   try {
-    const { query } = req;
-    const { rows } = await userModel.getUsers(query);
-    if (rows.length === 0) {
-      res.status(404).json({
-        msg: "Users not found",
-      });
-      return;
-    }
-    const meta = await userModel.getMetaUsers(query);
+    const { id } = req.authInfo;
+    const result = await userModel.getUsers(id);
     res.status(200).json({
-      data: rows,
-      meta,
+      user: result.rows[0],
     });
+    // Lakukan sesuatu dengan data pengguna yang ditemukan
   } catch (err) {
     console.error(err);
     res.status(500).json({
-      msg: "internal server error",
+      msg: "Internal server error",
     });
   }
 };
 
-const insertUsers = (req, res) => {
-  const { body } = req;
-  userModel.insertUsers(body, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        msg: "Email/Phone Number sudah terdaftar/Internal Server Sedang Error, Silahkan Coba Beberapa Saat Lagi",
+const insertUsers = async (req, res) => {
+  try {
+    const { body } = req;
+    const result = await userModel.checkEmail(body.email);
+    const results = await userModel.checkPhoneNumber(body.phone_number);
+
+    if (result.rows.length > 0 && body.email === result.rows[0].email) {
+      res.status(403).json({
+        msg: "Email Already Exist",
+      });
+    } else if (
+      results.rows.length > 0 &&
+      body.phone_number === results.rows[0].phone_number
+    ) {
+      res.status(403).json({
+        msg: "Phone Number Already Exist",
+      });
+    } else {
+      await userModel.insertUsers(body);
+
+      res.status(200).json({
+        msg: "Create Account Success",
       });
     }
-    res.status(200).json({
-      msg: "Insert User Berhasil",
-      data: body,
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      msg: "Internal Server Error",
     });
-  });
+  }
 };
 
 const cloudUpload = async (req, res) => {
@@ -108,7 +118,7 @@ const deleteUsers = (req, res) => {
 };
 
 module.exports = {
-  getUsers,
+  getUsersHandler,
   insertUsers,
   updateUser,
   deleteUsers,

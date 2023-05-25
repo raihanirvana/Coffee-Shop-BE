@@ -23,17 +23,6 @@ app.use(express.static("public"));
 const masterRouter = require("./src/routers");
 app.use(masterRouter);
 
-// const { client } = require("./src/configs/mongodb");
-
-// client
-//   .connect()
-//   .then(() => {
-//     app.listen(PORT, () => {
-//       console.log(`Server is running at port ${PORT}`);
-//     });
-//   })
-//   .catch((err) => console.log(err));
-
 const mongoose = require("mongoose");
 const {
   mongoPass,
@@ -48,8 +37,8 @@ mongoose
   )
   .then(() => {
     console.log("Mongo DB Connected");
-    app.listen(PORT, () => {
-      console.log(`Server us running at port ${PORT}`);
+    app.listen(PORT, "192.168.100.32", () => {
+      console.log(`Server is running at http://192.168.100.32:${PORT}`);
     });
   })
   .catch((err) => console.log(err));

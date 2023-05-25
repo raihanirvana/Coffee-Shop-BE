@@ -2,7 +2,8 @@ const db = require("../configs/postgre");
 
 const userVerification = (body) => {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT id, email,role_id,pass FROM users WHERE email = $1";
+    const sql =
+      "SELECT id, email,pass,phone_number,role_id,first_name,last_name,address,display_name,birthday,gender,image FROM users WHERE email = $1";
     db.query(sql, [body.email], (err, result) => {
       if (err) {
         return reject(err);
@@ -11,7 +12,24 @@ const userVerification = (body) => {
     });
   });
 };
-
+const checkEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const sqlQuery = "SELECT email, phone_number FROM users WHERE email = $1";
+    db.query(sqlQuery, [email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+const checkPhoneNumber = (phone_number) => {
+  return new Promise((resolve, reject) => {
+    const sqlQuery = "SELECT phone_number FROM users WHERE phone_number = $1";
+    db.query(sqlQuery, [phone_number], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
 // const storeToken = (userId, token) => {
 //   return new Promise((resolve, reject) => {
 //     const sql = "UPDATE users SET token = $1 WHERE id = $2";
@@ -60,20 +78,20 @@ const isTokenBlacklisted = (token) => {
   });
 };
 
-const getPassword = (body) => {
+const getPassword = (id) => {
   return new Promise((resolve, reject) => {
     const sql = "SELECT u.pass FROM users u WHERE id = $1";
-    db.query(sql, [body.id], (err, result) => {
+    db.query(sql, [id], (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
   });
 };
 
-const editPassword = (newPassword, body) => {
+const editPassword = (newPassword, id) => {
   return new Promise((resolve, reject) => {
     const sql = "UPDATE users SET pass = $1 WHERE id = $2";
-    db.query(sql, [newPassword, body.id], (err, result) => {
+    db.query(sql, [newPassword, id], (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
@@ -114,11 +132,10 @@ const addOTP = (otp, otp_expiration, email) => {
   });
 };
 
-const getOTP = (email) => {
+const getOTP = (otp) => {
   return new Promise((resolve, reject) => {
-    const sql =
-      "SELECT otp, otp_expiration FROM users WHERE email = $1 AND otp_expiration >= NOW()";
-    db.query(sql, [email], (err, result) => {
+    const sql = "SELECT otp, otp_expiration FROM users WHERE otp = $1";
+    db.query(sql, [otp], (err, result) => {
       if (err) {
         return reject(err);
       }
@@ -129,7 +146,7 @@ const getOTP = (email) => {
 
 const changeForgotpass = (email, hashedPassword) => {
   return new Promise((resolve, reject) => {
-    const sql = "UPDATE users SET pass = $1 WHERE email = $2";
+    const sql = "UPDATE users SET pass = $1 WHERE otp = $2";
     db.query(sql, [hashedPassword, email], (err, result) => {
       if (err) return reject(err);
       resolve(result);
@@ -150,4 +167,6 @@ module.exports = {
   addOTP,
   getOTP,
   changeForgotpass,
+  checkEmail,
+  checkPhoneNumber,
 };

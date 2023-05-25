@@ -1,25 +1,56 @@
 const db = require("../configs/postgre");
 const historyModel = require("../models/history.model");
 
-const getHistory = (req, res) => {
-  const { query } = req;
-  historyModel.getHistory(query, (err, result) => {
-    if (err) {
-      res.status(500).json({
-        msg: "internal server error",
-      });
-      return;
-    }
-    if (!result) {
-      res.status(404).json({
-        msg: "History not found",
-      });
-      return;
-    }
+const getHistoryHandler = async (req, res) => {
+  const { id } = req.authInfo;
+  try {
+    const result = await historyModel.getHistory(id);
     res.status(200).json({
-      data: result.rows,
+      history: result.rows,
     });
-  });
+  } catch (error) {
+    res.status(500).json({
+      msg: "internal server error",
+    });
+    console.log(error);
+  }
+};
+const patchStatus = async (req, res) => {
+  const { ids } = req.params;
+  const idArray = ids.split(",").map((id) => Number(id));
+  const { status_id } = req.body;
+
+  try {
+    const promises = idArray.map((id) =>
+      historyModel.patchStatusById(id, status_id)
+    );
+    await Promise.all(promises);
+
+    res.status(200).json({
+      success: true,
+      message: "Status updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+    console.log(error);
+  }
+};
+
+const getManageOrder = async (req, res) => {
+  try {
+    const result = await historyModel.manageOrder();
+    res.status(200).json({
+      history: result.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "internal server error",
+    });
+    console.log(error);
+  }
 };
 
 const insertHistory = (req, res) => {
@@ -95,8 +126,10 @@ const deleteHistory = (req, res) => {
 };
 
 module.exports = {
-  getHistory,
   insertHistory,
   updateHistory,
   deleteHistory,
+  getHistoryHandler,
+  getManageOrder,
+  patchStatus,
 };

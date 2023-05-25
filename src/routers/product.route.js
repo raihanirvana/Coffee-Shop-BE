@@ -1,22 +1,30 @@
 const { Router } = require("express");
 const productRouter = Router();
 const productController = require("../controllers/product.controller");
+const memoryUpload = require("../middlewares/memoryUpload");
 
-const { singleUpload } = require("../middlewares/diskUpload");
-const { checkToken, adminRole } = require("../middlewares/auth.middleware");
+const authMiddleware = require("../middlewares/auth.middleware");
 
 productRouter.get("/", productController.getProduct);
 productRouter.post(
   "/",
-  checkToken,
-  adminRole,
-  singleUpload("image"),
+  memoryUpload.single("image"),
+  productController.cloudUpload,
   productController.insertProduct
 );
 productRouter.patch(
   "/:id",
-  singleUpload("image"),
+  memoryUpload.single("image"),
+  productController.cloudUpload,
   productController.updateProduct
+);
+
+productRouter.patch(
+  "/updateProfile",
+  authMiddleware.checkToken,
+  memoryUpload.single("image"),
+  productController.cloudUpload,
+  productController.updateProfileController
 );
 productRouter.delete("/:id", productController.deleteProduct);
 // productRouter.patch(

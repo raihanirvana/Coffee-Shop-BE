@@ -1,47 +1,28 @@
 const db = require("../configs/postgre");
 
-const getUsers = (params) => {
+const getUsers = (id) => {
   return new Promise((resolve, reject) => {
-    let query =
-      "SELECT id,email,phone_number,first_name,last_name,address,display_name,birthday,gender,image from users";
-    let queryParams = [];
-    // search filter
-    if (params.userId) {
-      const userIdQuery = parseInt(params.userId);
-      query += " WHERE id = $1";
-      queryParams.push(userIdQuery);
-    }
-    // sort filter
-    if (params.sort) {
-      const sortQuery = params.sort === "asc" ? "ASC" : "DESC";
-      query += ` ORDER BY id ${sortQuery}`;
-    } else {
-      query += " ORDER BY id ASC";
-    }
-    // limit filter
-    if (params.limit) {
-      const limitQuery = parseInt(params.limit);
-      query += ` LIMIT $${queryParams.length + 1}`;
-      queryParams.push(limitQuery);
-    }
-    db.query(query, queryParams, (error, result) => {
-      if (error) {
-        reject(error);
-        return;
+    const sql =
+      "SELECT email, phone_number, first_name, last_name, address, display_name, birthday, gender, image FROM users WHERE id = $1";
+    db.query(sql, [id], (err, result) => {
+      if (err) {
+        return reject(err);
       }
       resolve(result);
     });
   });
 };
 
-const insertUsers = (body, callback) => {
-  let sql =
-    "INSERT INTO users (email, pass, role_id, phone_number) VALUES ($1, $2, 1, $3)";
-  db.query(sql, [body.email, body.pass, body.phone_number], (err, result) => {
-    if (err) {
-      return callback(err, null);
-    }
-    callback(null, result.rows);
+const insertUsers = (body) => {
+  return new Promise((resolve, reject) => {
+    let sql =
+      "INSERT INTO users (email, pass, role_id, phone_number) VALUES ($1, $2, 1, $3)";
+    db.query(sql, [body.email, body.pass, body.phone_number], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result.rows);
+    });
   });
 };
 
@@ -79,7 +60,7 @@ const getMetaUsers = (params) => {
   });
 };
 
-updateUsers = (id, body, callback) => {
+const updateUsers = (id, body, callback) => {
   let updates = [];
   let values = [];
   Object.keys(body).forEach((key, index) => {
@@ -110,6 +91,24 @@ const deleteUsers = (id, callback) => {
     }
   });
 };
+const checkEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const sqlQuery = "SELECT email, phone_number FROM users WHERE email = $1";
+    db.query(sqlQuery, [email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+const checkPhoneNumber = (phone_number) => {
+  return new Promise((resolve, reject) => {
+    const sqlQuery = "SELECT phone_number FROM users WHERE phone_number = $1";
+    db.query(sqlQuery, [phone_number], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
 
 module.exports = {
   getUsers,
@@ -117,4 +116,6 @@ module.exports = {
   updateUsers,
   deleteUsers,
   getMetaUsers,
+  checkEmail,
+  checkPhoneNumber,
 };

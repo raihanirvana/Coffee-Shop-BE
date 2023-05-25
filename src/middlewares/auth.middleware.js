@@ -4,7 +4,6 @@ const authModels = require("../models/auth.model");
 
 const checkToken = async (req, res, next) => {
   const bearerToken = req.header("authorization");
-  console.log(bearerToken);
   if (!bearerToken)
     return res.status(403).json({
       msg: "silahkan login terlebih dahulu",
@@ -25,7 +24,6 @@ const checkToken = async (req, res, next) => {
         msg: "internal server error",
       });
     req.authInfo = payload;
-    console.log(payload);
     next();
   });
 };
