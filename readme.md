@@ -19,6 +19,7 @@ Backend for coffee shop
   - [Installation](#installation)
 - [Resources](#resources)
 - [Contributors](#contributors)
+- [Related Project](#related-projects)
 - [License](#license)
 - [Suggestion](#suggestion)
 
@@ -100,6 +101,10 @@ Special thanks to:
 ## Contributors
 
 Currently, there are no contributors to this project. If you would like to contribute, you can submit a pull request.
+
+## Related Projects
+
+- [Coffee Shop Front End](https://github.com/raihanirvana/Coffee-Shop-FrontEnd) - Front End
 
 ## License
 
