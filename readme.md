@@ -17,6 +17,7 @@ Backend for coffee shop
 - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
   - [Installation](#installation)
+- [Postman Collection](#postman-collection)
 - [Resources](#resources)
 - [Contributors](#contributors)
 - [Related Project](#related-projects)
@@ -91,6 +92,10 @@ Backend for coffee shop
    ```bash
    npm run dev
    ```
+
+## Postman Collection
+
+You can download in [here](https://drive.google.com/drive/folders/1zEkRmOgClPXRBaBBTZKbvcoegu0NT56Q?hl=id).
 
 ## Resources
 
