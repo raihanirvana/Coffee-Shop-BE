@@ -1,42 +1,110 @@
-<div align="center">
-<img src="https://skillicons.dev/icons?i=nodejs,javascript,html,vercel,mongodb," />
+<div align='center' style="text-align: center;">
 
-  <p align="center">
-    <a href="https://backend-week5.vercel.app/">View Demo</a>
-    ·
-    <a href="mailto:raihanirvana13@gmail.com">Report Bug</a>
-    ·
-    <a href="mailto:raihanirvana13@gmail.com">Request Feature</a>
-  </p>
+<h1 style="border:0;margin:1rem">Coffee Shop Backend</h1>
+
+Backend for coffee shop
+
+[Demo](backend-week5.vercel.app) · [Suggestion](mailto:raihanirvana13@gmail.com)
+
+<hr>
+<br>
+
 </div>
 
-## Coffee Shop Backend
+## Table of Contents
 
-This is a backend for the coffee shop
+- [Table of Contents](#table-of-contents)
+- [Technologies Used](#technologies-used)
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+- [Resources](#resources)
+- [Contributors](#contributors)
+- [License](#license)
+- [Suggestion](#suggestion)
 
-## Build With
+## Technologies Used
 
-This application is built using Node.js,Express.js,JSON Web Token,MongoDB,and Cloudinary.
+- [Node js](https://nodejs.org/en/docs)
+- [Express js](https://expressjs.com/)
+- [JsonWebToken](https://www.npmjs.com/package/jsonwebtoken)
+- [MongoDB](https://www.mongodb.com/docs/)
+- [Cloudinary](https://cloudinary.com/)
+- etc.
 
-## Features
+## Getting Started
 
-- Login
-- Register
-- Forgot Password
-- Buy Coffee
-- Payment
-- Edit Profile
-- Etc
+### Installation
 
-## How to run the application
+1. Clone this repo
 
-To run the application, follow these steps:
+   ```bash
+   git clone https://github.com/raihanirvana/Coffee-Shop-BE.git
+   ```
 
-1. Clone this repository to your computer.
-2. Open a terminal in the repository directory and run the `npm install` command to install all required dependencies.
-3. After it finishes, run the `npm run dev` command to run the application.
-4. Open a browser and visit `http://localhost:3000` to see the application.
+2. Enter the directory
 
-## Contributions
+   ```bash
+   cd Coffee-Shop-BE
+   ```
 
-If you would like to contribute to this project, please send a pull request to this repository. We greatly appreciate your contributions.
+3. Install all dependencies
+
+   ```bash
+   npm install
+   ```
+
+4. Create .env file
+
+   ```env
+   DB_HOST = [YOUR DATABASE HOST]
+   DB_NAME = [YOUR DATABASE NAME]
+   DB_PORT = [YOUR DATABASE PORT]
+   DB_USER = [YOUR DATABASE USERNAME]
+   DB_PASS = [YOUR DATABASE PASSWORD]
+
+   JWT_SECRET_KEY = [YOUR JWT SECRET KEY]
+
+   CLOUD_NAME = [YOUR CLOUDINARY NAME]
+   CLOUD_KEY = [YOUR CLOUDINARY API KEY]
+   CLOUD_SECRET = [YOUR CLOUDINARY API SECRET]
+
+   MONGODB_USER = [YOUR MONGODB USERNAME]
+   MONGODB_PASS = [YOUR MONGODB PASSWORD]
+   MONGODB_HOST = [YOUR MONGODB HOSTNAME]
+   MONGODB_NAME = [YOUR MONGODB DATABASE NAME]
+
+   NODEMAILER_HOST = [YOUR SMTP HOST]
+   NODEMAILER_PORT = [YOUR SMTP PORT]
+   NODEMAILER_USER = [YOUR SMTP EMAIL/USER]
+   NODEMAILER_PASS = [YOUR SMTP PASSWORD]
+   ```
+
+5. Start the local server
+
+   ```bash
+   node index.js
+   ```
+
+   or (if you want auto start if any change in code)
+
+   ```bash
+   npm run dev
+   ```
+
+## Resources
+
+Special thanks to:
+
+- [Vercel](https://vercel.com) - deploying code
+
+## Contributors
+
+Currently, there are no contributors to this project. If you would like to contribute, you can submit a pull request.
+
+## License
+
+This project is licensed under the ISC License
+
+## Suggestion
+
+If you find bugs / find better ways / suggestions you can pull request.
